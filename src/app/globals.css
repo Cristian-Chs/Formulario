@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 30, 41, 59; /* slate-800 */
+  --background-start-rgb: 248, 250, 252; /* slate-50 */
+  --background-end-rgb: 240, 253, 250; /* teal-50 */
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+  min-height: 100vh;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(18, 59, 85, 0.2);
+}
