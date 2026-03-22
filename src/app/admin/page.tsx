@@ -351,7 +351,7 @@ export default function AdminPage() {
                   min={qType === "scale" ? "1" : undefined}
                   max={qType === "scale" ? "10" : undefined}
                   value={qCorrectAnswer} 
-                  onChange={(e) => setQCorrectAnswer(qType === "scale" ? (e.target.value ? Number(e.target.value) : "") : e.target.value)} 
+                  onChange={(e) => setQCorrectAnswer(e.target.value)} 
                   className="w-full bg-surface-700 p-4 rounded-xl border border-slate-300 text-slate-800 outline-none focus:border-brand-primary placeholder:text-slate-400" 
                   placeholder={qType === "multiple" ? "Debe coincidir EXACTAMENTE con una opción" : qType === "scale" ? "Número del 1 al 10" : ""} 
                 />
