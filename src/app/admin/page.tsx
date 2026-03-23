@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getAllResponses, getQuestions, addQuestion, updateQuestion, deleteQuestion } from "@/lib/db";
 import { motion, AnimatePresence } from "framer-motion";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const ADMIN_EMAIL = "cristian.adrian.chirinos2@gmail.com"; 
 
@@ -94,6 +96,67 @@ export default function AdminPage() {
     }
   };
 
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Configuración del título
+    doc.setFontSize(22);
+    doc.setTextColor(230, 0, 0); // Color similar al rojo de la marca
+    doc.text("REPORTE DE PARTICIPANTES", 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 28);
+    doc.text(`Total de respuestas: ${responses.length}`, 14, 33);
+
+    const tableData = responses.map((res) => {
+      let score = 0;
+      let totalEvaluable = 0;
+      questions.forEach(q => {
+        if (q.correctAnswer) {
+          totalEvaluable++;
+          if (isCorrect(q, res.responses[q.id])) score++;
+        }
+      });
+
+      // Formatear respuestas para el PDF
+      const answersDetail = questions.map(q => {
+        const answer = res.responses[q.id];
+        if (answer === undefined) return null;
+        const correct = isCorrect(q, answer);
+        const status = correct === true ? "[CORRECTO]" : (correct === false ? "[INCORRECTO]" : "");
+        return `${q.title}: ${answer} ${status}`;
+      }).filter(Boolean).join("\n\n");
+
+      return [
+        res.userProfile?.name || "Sin nombre",
+        res.userProfile?.email || "Sin email",
+        res.createdAt?.toDate ? res.createdAt.toDate().toLocaleString() : "Reciente",
+        totalEvaluable > 0 ? `${score}/${totalEvaluable}` : "N/A",
+        answersDetail
+      ];
+    });
+
+    (doc as any).autoTable({
+      startY: 40,
+      head: [['Participante', 'Email', 'Fecha', 'Nota', 'Detalle de Respuestas']],
+      body: tableData,
+      theme: 'grid',
+      headStyles: { fillColor: [230, 0, 0], textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 8, cellPadding: 3, valign: 'middle', overflow: 'linebreak' },
+      columnStyles: {
+        0: { cellWidth: 25 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 15 },
+        4: { cellWidth: 'auto' }
+      },
+      margin: { top: 40 }
+    });
+
+    doc.save(`Reporte_Formulario_${new Date().getTime()}.pdf`);
+  };
+
   // Helper para verificar si la respuesta es correcta
   const isCorrect = (question: any, answer: any) => {
     if (!question.correctAnswer) return null; // No hay respuesta correcta definida
@@ -127,12 +190,21 @@ export default function AdminPage() {
               Administración del {activeTab === "respuestas" ? "Cuestionario" : "Gestor de Preguntas"}
             </p>
           </div>
-          <button 
-            onClick={fetchAllData} 
-            className="px-6 py-3 bg-brand-primary text-white hover:scale-105 active:scale-95 rounded-xl text-sm font-black transition-all shadow-glow"
-          >
-            ACTUALIZAR DATOS
-          </button>
+          <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+            <button 
+              onClick={downloadPDF} 
+              disabled={responses.length === 0}
+              className="px-6 py-3 bg-white text-black hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-sm font-black transition-all shadow-xl uppercase tracking-widest"
+            >
+              Descargar PDF
+            </button>
+            <button 
+              onClick={fetchAllData} 
+              className="px-6 py-3 bg-brand-primary text-white hover:scale-105 active:scale-95 rounded-xl text-sm font-black transition-all shadow-glow"
+            >
+              ACTUALIZAR DATOS
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}

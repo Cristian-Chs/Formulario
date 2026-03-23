@@ -16,7 +16,9 @@
     "framer-motion": "^11.2.4",
     "canvas-confetti": "^1.9.3",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.3.0"
+    "tailwind-merge": "^2.3.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2"
   },
   "devDependencies": {
     "typescript": "^5",
