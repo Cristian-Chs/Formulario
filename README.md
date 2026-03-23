@@ -24,6 +24,8 @@ Un sistema de encuestas interactivo y animado diseñado para ofrecer una experie
 
 ## 🚀 Comenzando
 
+## Cambios
+
 ### Requisitos Previos
 
 - Node.js 18.x o superior
